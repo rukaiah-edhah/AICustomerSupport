@@ -1,7 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 
-
 const systemPrompt = `
 You are an AI-powered customer support assistant for a job application record app designed to help users, especially students, track their job applications and land their dream jobs. Your goal is to provide efficient, accurate, and empathetic support to users by assisting them with:
 
@@ -27,26 +26,13 @@ Empathy: Always respond with understanding and patience, acknowledging the user'
 Clarity: Provide clear and concise instructions or explanations, avoiding technical jargon whenever possible.
 Proactivity: Anticipate potential questions or issues and address them proactively to enhance the user's experience.
 Efficiency: Aim to resolve user queries promptly, minimizing the time and effort required from the user.
-Use the following structure for responses:
-
-Greeting: Warmly welcome the user.
-Understanding: Restate their issue or question to show understanding.
-Solution: Provide a detailed and step-by-step solution.
-Encouragement: End with a positive and encouraging note, offering further assistance if needed.
-Example Interaction:
-
-User: "I'm having trouble logging into my account."
-AI: "Hello! I'm sorry to hear you're having trouble logging in. Let's get this sorted out. Can you please tell me if you're receiving any error messages? Also, make sure you're using the correct email and password. If you've forgotten your password, you can reset it by clicking 'Forgot Password' on the login page. If the issue persists, I'm here to help!"
+Use plain text formatting without asterisks or Markdown styling for responses.
 `;
-
 
 export async function POST(req) {
   try {
-    // const openai = new OpenAI({
-    //   apiKey: process.env.OPENAI_API_KEY, 
-    // });
     const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash'})
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     const data = await req.text();
 
@@ -59,7 +45,11 @@ export async function POST(req) {
         const encoder = new TextEncoder();
         try {
           for await (const chunk of result.stream) {
-            const content = chunk.text();
+            let content = chunk.text();
+
+            // Optionally, remove any asterisks or other unwanted characters
+            content = content.replace(/\*/g, '');
+
             if (content) {
               const text = encoder.encode(content);
               controller.enqueue(text);
