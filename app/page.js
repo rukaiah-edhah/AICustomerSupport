@@ -75,6 +75,7 @@ export default function Home() {
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
+      e.preventDefault();
       sendMessage()
     }
   }

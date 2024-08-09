@@ -1,5 +1,6 @@
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
-import OpenAI from "openai";
+
 
 const systemPrompt = `
 You are an AI-powered customer support assistant for a job application record app designed to help users, especially students, track their job applications and land their dream jobs. Your goal is to provide efficient, accurate, and empathetic support to users by assisting them with:
@@ -38,31 +39,27 @@ User: "I'm having trouble logging into my account."
 AI: "Hello! I'm sorry to hear you're having trouble logging in. Let's get this sorted out. Can you please tell me if you're receiving any error messages? Also, make sure you're using the correct email and password. If you've forgotten your password, you can reset it by clicking 'Forgot Password' on the login page. If the issue persists, I'm here to help!"
 `;
 
+
 export async function POST(req) {
   try {
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY, 
-    });
-    const data = await req.json();
+    // const openai = new OpenAI({
+    //   apiKey: process.env.OPENAI_API_KEY, 
+    // });
+    const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash'})
 
-    const completion = await openai.chat.completions.create({
-      messages: [
-        {
-          role: "system",
-          content: systemPrompt,
-        },
-        ...data,
-      ],
-      model: "gpt-4",
-      stream: true,
-    });
+    const data = await req.text();
+
+    const result = await model.generateContentStream(
+      [systemPrompt, ...data]
+    );
 
     const stream = new ReadableStream({
       async start(controller) {
         const encoder = new TextEncoder();
         try {
-          for await (const chunk of completion) {
-            const content = chunk.choices[0].delta.content;
+          for await (const chunk of result.stream) {
+            const content = chunk.text();
             if (content) {
               const text = encoder.encode(content);
               controller.enqueue(text);
