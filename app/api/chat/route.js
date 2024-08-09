@@ -38,42 +38,33 @@ User: "I'm having trouble logging into my account."
 AI: "Hello! I'm sorry to hear you're having trouble logging in. Let's get this sorted out. Can you please tell me if you're receiving any error messages? Also, make sure you're using the correct email and password. If you've forgotten your password, you can reset it by clicking 'Forgot Password' on the login page. If the issue persists, I'm here to help!"
 `;
 
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY, 
+});
+
 export async function POST(req) {
   try {
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY, 
-    });
     const data = await req.json();
 
     const completion = await openai.chat.completions.create({
       messages: [
-        {
-          role: "system",
-          content: systemPrompt,
-        },
+        { role: "system", content: systemPrompt },
         ...data,
       ],
-      model: "gpt-4",
+      model: "gpt-3.5-turbo",
       stream: true,
     });
 
     const stream = new ReadableStream({
       async start(controller) {
         const encoder = new TextEncoder();
-        try {
-          for await (const chunk of completion) {
-            const content = chunk.choices[0].delta.content;
-            if (content) {
-              const text = encoder.encode(content);
-              controller.enqueue(text);
-            }
+        for await (const chunk of completion) {
+          const content = chunk.choices[0]?.delta?.content;
+          if (content) {
+            controller.enqueue(encoder.encode(content));
           }
-        } catch (err) {
-          controller.error(err);
-          console.error("Stream error:", err);
-        } finally {
-          controller.close();
         }
+        controller.close();
       },
     });
 
