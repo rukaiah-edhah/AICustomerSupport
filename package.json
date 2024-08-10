@@ -13,6 +13,7 @@
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
     "@google/generative-ai": "^0.16.0",
+    "@mui/icons-material": "^5.16.7",
     "@mui/material": "^5.16.6",
     "@nanostores/react": "github:ai/react",
     "ai": "^3.3.5",

@@ -1,7 +1,8 @@
 'use client'
 
-import { Box, Button, Stack, TextField } from '@mui/material'
+import { AppBar, Toolbar, Typography, Box, Button, Stack, TextField, IconButton } from '@mui/material'
 import { useState, useRef, useEffect } from 'react'
+import LoginIcon from '@mui/icons-material/Login'; 
 
 export default function Home() {
   const [messages, setMessages] = useState([
@@ -12,6 +13,7 @@ export default function Home() {
   ])
   const [message, setMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [chatStarted, setChatStarted] = useState(false) 
 
   const messagesEndRef = useRef(null)
 
@@ -26,6 +28,11 @@ export default function Home() {
   const sendMessage = async () => {
     if (!message.trim() || isLoading) return
     setIsLoading(true)
+
+    // Mark chat as started
+    if (!chatStarted) {
+      setChatStarted(true)
+    }
   
     setMessage('')
     setMessages((messages) => [
@@ -86,23 +93,54 @@ export default function Home() {
       height="100vh"
       display="flex"
       flexDirection="column"
-      justifyContent="center"
+      justifyContent="flex-start"
       alignItems="center"
+      bgcolor="white"
     >
-      <Stack
-        direction={'column'}
-        width="500px"
-        height="700px"
-        border="1px solid black"
-        p={2}
-        spacing={3}
-      >
+      <AppBar position="static" color="default" elevation={0} style={{ backgroundColor: 'white', padding: '10px 20px' }}>
+        <Toolbar style={{ backgroundColor: 'white', color: 'black', display: 'flex', justifyContent: 'space-between' }}>
+          <Typography variant="h6">
+          </Typography>
+          <Button color="inherit" endIcon={<LoginIcon />}>
+            Login
+          </Button>
+        </Toolbar>
+      </AppBar>
+      {!chatStarted && (
+        <Box
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          justifyContent="center" 
+          textAlign="center"
+          flexGrow={1} 
+        >
+          <Typography variant="h4" color="black">
+            I am your AI-powered job application assistant.
+          </Typography>
+          <Typography variant="h6" color="black" mt={2}>
+            How can I help you achieve your career goals today?
+          </Typography>
+
+          <Stack direction={'row'} spacing={2} mt={4}>
+            <Button variant="outlined" style={{ borderColor: 'black', color: 'black', padding: '10px 20px' }}>
+              sample question 1 
+            </Button>
+            <Button variant="outlined" style={{ borderColor: 'black', color: 'black', padding: '10px 20px' }}>
+              sample question 2
+            </Button>
+          </Stack>
+        </Box>
+      )}
+      {chatStarted && (
         <Stack
           direction={'column'}
           spacing={2}
-          flexGrow={1}
+          width="60%"
+          maxHeight="60vh"
           overflow="auto"
-          maxHeight="100%"
+          flexGrow={1} 
+          mb={2} 
         >
           {messages.map((message, index) => (
             <Box
@@ -115,12 +153,12 @@ export default function Home() {
               <Box
                 bgcolor={
                   message.role === 'assistant'
-                    ? 'primary.main'
-                    : 'secondary.main'
+                    ? 'white' 
+                    : 'lightgrey' 
                 }
-                color="white"
+                color="black" 
                 borderRadius={16}
-                p={3}
+                p={2}
               >
                 {message.content}
               </Box>
@@ -128,23 +166,32 @@ export default function Home() {
           ))}
           <div ref={messagesEndRef} />
         </Stack>
-        <Stack direction={'row'} spacing={2}>
-          <TextField
-            label="Message"
-            fullWidth
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
-            disabled={isLoading}
-          />
-          <Button 
-            variant="contained" 
-            onClick={sendMessage}
-            disabled={isLoading}
-          >
-            {isLoading ? 'Sending...' : 'Send'}
-          </Button>
-        </Stack>
+      )}
+      <Stack 
+        direction={'row'} 
+        spacing={2} 
+        width="60%" 
+        mb={4} 
+        position="fixed" 
+        bottom={16} 
+      >
+        <TextField
+          label="Send a message."
+          fullWidth
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          onKeyPress={handleKeyPress}
+          disabled={isLoading}
+          variant="outlined"
+        />
+        <Button 
+          variant="contained" 
+          onClick={sendMessage}
+          disabled={isLoading}
+          style={{ backgroundColor: 'black', color: 'white' }}
+        >
+          {isLoading ? 'Sending...' : 'Send'}
+        </Button>
       </Stack>
     </Box>
   )
