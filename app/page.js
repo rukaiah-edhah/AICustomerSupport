@@ -20,12 +20,11 @@ import MenuIcon from "@mui/icons-material/Menu";
 export default function Home() {
   const [messages, setMessages] = useState([
     {
-      role: "assistant",
-      content:
-        "I am your AI-powered job application assistant. How can I help you achieve your career goals today?",
+      role: 'assistant',
+      content: "I am your AI-powered job application assistant. How can I help you achieve your career goals today?",
     },
   ]);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [chatStarted, setChatStarted] = useState(false);
   const [selectedChat, setSelectedChat] = useState(null);
@@ -36,39 +35,40 @@ export default function Home() {
   const user = useKindeBrowserClient().user;
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  const sendMessage = async () => {
-    if (!message.trim() || isLoading) return;
+  const sendMessage = async (text) => {
+    const currentMessage = text || message;
+    if (!currentMessage.trim() || isLoading) return;
     setIsLoading(true);
 
     if (!chatStarted) {
       setChatStarted(true);
     }
 
-    setMessage("");
+    setMessage('');
     setMessages((messages) => [
       ...messages,
-      { role: "user", content: message },
-      { role: "assistant", content: "" },
+      { role: 'user', content: currentMessage },
+      { role: 'assistant', content: '' },
     ]);
 
     try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
+      const response = await fetch('/api/chat', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify([...messages, { role: "user", content: message }]),
+        body: JSON.stringify([...messages, { role: 'user', content: currentMessage }]),
       });
 
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        throw new Error('Network response was not ok');
       }
 
       const reader = response.body.getReader();
@@ -88,83 +88,48 @@ export default function Home() {
         });
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error('Error:', error);
       setMessages((messages) => [
         ...messages,
-        {
-          role: "assistant",
-          content:
-            "I'm sorry, but I encountered an error. Please try again later.",
-        },
+        { role: 'assistant', content: "I'm sorry, but I encountered an error. Please try again later." },
       ]);
     }
     setIsLoading(false);
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       e.preventDefault();
       sendMessage();
     }
   };
 
-  const chatHistory = {
-    0: [
-      { role: "user", content: "Example Chat 1 - User Message 1" },
-      { role: "assistant", content: "Example Chat 1 - Assistant Response 1" },
-    ],
-    1: [
-      { role: "user", content: "Example Chat 2 - User Message 1" },
-      { role: "assistant", content: "Example Chat 2 - Assistant Response 1" },
-    ],
-  };
-
   return (
-    <Box width="100vw" height="100vh" display="flex" bgcolor="white">
+    <Box
+      width="100vw"
+      height="100vh"
+      display="flex"
+      bgcolor="white"
+    >
       {isSidebarOpen && (
-        <ChatSidebar
-          selectedChat={selectedChat}
-          setSelectedChat={setSelectedChat}
-        />
+        <ChatSidebar selectedChat={selectedChat} setSelectedChat={setSelectedChat} />
       )}
 
-      <Box
-        flexGrow={1}
-        display="flex"
-        flexDirection="column"
-        justifyContent="flex-start"
-        alignItems="center"
-      >
-        <AppBar
-          position="static"
-          color="default"
-          elevation={0}
-          style={{ backgroundColor: "white", padding: "10px 20px" }}
-        >
-          <Toolbar
-            style={{
-              backgroundColor: "white",
-              color: "black",
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
-            <IconButton
-              edge="start"
-              color="inherit"
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            >
+      <Box flexGrow={1} display="flex" flexDirection="column" justifyContent="flex-start" alignItems="center">
+        <AppBar position="static" color="default" elevation={0} style={{ backgroundColor: 'white', padding: '10px 20px' }}>
+          <Toolbar style={{ backgroundColor: 'white', color: 'black', display: 'flex', justifyContent: 'space-between' }}>
+            <IconButton edge="start" color="inherit" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
               <MenuIcon />
             </IconButton>
             <Typography variant="h6"></Typography>
             {user ? (
-              <LogoutLink style={{ color: "black" }}>
+              <LogoutLink style={{ color: 'black' }}>
                 <Button color="inherit" endIcon={<LoginIcon />}>
                   Logout
                 </Button>
               </LogoutLink>
             ) : (
-              <LoginLink style={{ color: "black" }}>
+              <LoginLink style={{ color: 'black' }}>
                 <Button color="inherit" endIcon={<LoginIcon />}>
                   Login
                 </Button>
@@ -172,7 +137,7 @@ export default function Home() {
             )}
           </Toolbar>
         </AppBar>
-        {selectedChat === null && !chatStarted ? (
+        {!chatStarted && (
           <Box
             display="flex"
             flexDirection="column"
@@ -188,32 +153,27 @@ export default function Home() {
               How can I help you achieve your career goals today?
             </Typography>
 
-            <Stack direction={"row"} spacing={2} mt={4}>
+            <Stack direction={'row'} spacing={2} mt={4}>
               <Button
                 variant="outlined"
-                style={{
-                  borderColor: "black",
-                  color: "black",
-                  padding: "10px 20px",
-                }}
+                style={{ borderColor: 'black', color: 'black', padding: '10px 20px' }}
+                onClick={() => sendMessage('how to prepare for an SWE technical interview')}
               >
-                sample question 1
+                how to prepare for an SWE technical interview
               </Button>
               <Button
                 variant="outlined"
-                style={{
-                  borderColor: "black",
-                  color: "black",
-                  padding: "10px 20px",
-                }}
+                style={{ borderColor: 'black', color: 'black', padding: '10px 20px' }}
+                onClick={() => sendMessage('how to write a good resume for a data science role')}
               >
-                sample question 2
+                how to write a good resume for a data science role
               </Button>
             </Stack>
           </Box>
-        ) : (
+        )}
+        {chatStarted && (
           <Stack
-            direction={"column"}
+            direction={'column'}
             spacing={2}
             width="60%"
             maxHeight="60vh"
@@ -221,33 +181,27 @@ export default function Home() {
             flexGrow={1}
             mb={2}
           >
-            {(selectedChat !== null ? chatHistory[selectedChat] : messages).map(
-              (message, index) => (
+            {messages.map((message, index) => (
+              <Box
+                key={index}
+                display="flex"
+                justifyContent={message.role === 'assistant' ? 'flex-start' : 'flex-end'}
+              >
                 <Box
-                  key={index}
-                  display="flex"
-                  justifyContent={
-                    message.role === "assistant" ? "flex-start" : "flex-end"
-                  }
+                  bgcolor={message.role === 'assistant' ? 'white' : 'lightgrey'}
+                  color="black"
+                  borderRadius={16}
+                  p={2}
                 >
-                  <Box
-                    bgcolor={
-                      message.role === "assistant" ? "white" : "lightgrey"
-                    }
-                    color="black"
-                    borderRadius={16}
-                    p={2}
-                  >
-                    {message.content}
-                  </Box>
+                  {message.content}
                 </Box>
-              )
-            )}
+              </Box>
+            ))}
             <div ref={messagesEndRef} />
           </Stack>
         )}
         <Stack
-          direction={"row"}
+          direction={'row'}
           spacing={2}
           width="60%"
           mb={4}
@@ -265,11 +219,11 @@ export default function Home() {
           />
           <Button
             variant="contained"
-            onClick={sendMessage}
+            onClick={() => sendMessage()}
             disabled={isLoading}
-            style={{ backgroundColor: "black", color: "white" }}
+            style={{ backgroundColor: 'black', color: 'white' }}
           >
-            {isLoading ? "Sending..." : "Send"}
+            {isLoading ? 'Sending...' : 'Send'}
           </Button>
         </Stack>
       </Box>
