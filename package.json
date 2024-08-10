@@ -21,6 +21,7 @@
     "@nanostores/react": "github:ai/react",
     "ai": "^3.3.5",
     "dotenv": "^16.4.5",
+    "drizzle-orm": "^0.33.0",
     "next": "14.2.5",
     "openai": "^4.55.1",
     "postgres": "^3.4.4",
