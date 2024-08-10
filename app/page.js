@@ -4,6 +4,8 @@ import { AppBar, Toolbar, Typography, Box, Button, Stack, TextField, IconButton 
 import { useState, useRef, useEffect } from 'react'
 import LoginIcon from '@mui/icons-material/Login'; 
 import ChatSidebar from '@/components/ChatSidebar';
+import { LoginLink, LogoutLink } from '@kinde-oss/kinde-auth-nextjs';
+import { useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs';
 
 export default function Home() {
   const [messages, setMessages] = useState([
@@ -19,6 +21,8 @@ export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const messagesEndRef = useRef(null)
+
+  const user = useKindeBrowserClient().user;
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -121,9 +125,23 @@ export default function Home() {
             <Button color="inherit" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
               {isSidebarOpen ? 'Hide Sidebar' : 'Show Sidebar'}
             </Button>
-            <Button color="inherit" endIcon={<LoginIcon />}>
-              Login
-            </Button>
+            {user ? (
+              <>
+                <LogoutLink style={{ color: 'black'}}>
+                  <Button color="inherit" endIcon={<LoginIcon />}>
+                    Logout
+                  </Button>
+                </LogoutLink> 
+              </>
+            ) : (
+              <>
+                <LoginLink style={{ color: 'black'}}>
+                  <Button color="inherit" endIcon={<LoginIcon />}>
+                    Login
+                  </Button>
+                </LoginLink> 
+              </>
+            )}   
           </Toolbar>
         </AppBar>
 

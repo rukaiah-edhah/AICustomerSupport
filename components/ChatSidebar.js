@@ -1,12 +1,16 @@
-import { Drawer, List, ListItem, ListItemText } from '@mui/material';
-import { useState } from 'react';
+'use client'
+import { Box, Drawer, List, ListItem, ListItemText, Typography } from '@mui/material';
+import { useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs';
 
-function ChatSidebar({ selectedChat, setSelectedChat }) {
+export default function ChatSidebar({ selectedChat, setSelectedChat }) {
   // Example chat history - this will eventually be fetched from Supabase
   const chatHistory = [
     { role: 'user', message: 'Example Chat 1', created_at: new Date().toLocaleString() },
     { role: 'assistant', message: 'Example Chat 2', created_at: new Date().toLocaleString() },
   ];
+
+  const { user, getUser } = useKindeBrowserClient();
+  const alsoUser = getUser();
 
   return (
     <Drawer
@@ -14,6 +18,19 @@ function ChatSidebar({ selectedChat, setSelectedChat }) {
       anchor="left"
       sx={{ width: 300, flexShrink: 0, [`& .MuiDrawer-paper`]: { width: 300 } }}
     >
+      {user ? (
+        <>
+          <Box
+            display='flex'
+            flexDirection="row"
+            alignItems='center'
+            justifyContent='start'
+            margin={2}
+          >
+            <Typography variant="h6">Welcome, {alsoUser.given_name}!</Typography>
+          </Box>
+        </>
+      ) : null}
       <List>
         {chatHistory.map((chat, index) => (
           <ListItem
@@ -32,5 +49,3 @@ function ChatSidebar({ selectedChat, setSelectedChat }) {
     </Drawer>
   );
 }
-
-export default ChatSidebar;
