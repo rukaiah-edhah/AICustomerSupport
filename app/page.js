@@ -159,7 +159,7 @@ export default function Home() {
                 style={{ borderColor: 'black', color: 'black', padding: '10px 20px' }}
                 onClick={() => sendMessage('how to prepare for an SWE technical interview')}
               >
-                how to prepare for an SWE technical interview
+                how to prepare for a SWE technical interview
               </Button>
               <Button
                 variant="outlined"
