@@ -1,5 +1,8 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
+import { db } from "@/db";
+import { chat } from '@/db/schema/chat';
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 
 const systemPrompt = `
 You are an AI-powered customer support assistant for a job application record app designed to help users, especially students, track their job applications and land their dream jobs. Your goal is to provide efficient, accurate, and empathetic support to users by assisting them with:
@@ -35,6 +38,26 @@ export async function POST(req) {
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     const data = await req.text();
+
+    const { getUser } = getKindeServerSession();
+    const user = await getUser();
+
+    let parsedData = JSON.parse(data);
+
+    for (const item of parsedData){
+      if (user){
+        await db.insert(chat).values({
+          user_id: user?.id,
+          role: item.role,
+          content: item.content
+        })
+      } else {
+        await db.insert(chat).values({
+          role: item.role,
+          content: item.content
+        })
+      }
+    }
 
     const result = await model.generateContentStream(
       [systemPrompt, ...data]

@@ -15,6 +15,13 @@
       "when": 1723329696371,
       "tag": "0001_safe_catseye",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1723331374466,
+      "tag": "0002_adorable_wiccan",
+      "breakpoints": true
     }
   ]
 }
