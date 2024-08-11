@@ -1,13 +1,13 @@
 'use client'
 
-import { Box, Button, Divider, Drawer, List, ListItem, ListItemText, Typography } from '@mui/material';
+import { Box, Drawer, List, ListItem, ListItemText, Typography } from '@mui/material';
 import { useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs';
 
-export default function ChatSidebar({ selectedChat, setSelectedChat, onNewChat }) {
+export default function ChatSidebar({ selectedChat, setSelectedChat }) {
   // Example chat history - this will eventually be fetched from the database
   const chatHistory = [
     { role: 'user', message: 'Example Chat 1', created_at: new Date().toLocaleString() },
-    // { role: 'assistant', message: 'Example Chat 2', created_at: new Date().toLocaleString() },
+    { role: 'assistant', message: 'Example Chat 2', created_at: new Date().toLocaleString() },
   ];
 
   const { user, getUser } = useKindeBrowserClient();
@@ -30,21 +30,6 @@ export default function ChatSidebar({ selectedChat, setSelectedChat, onNewChat }
           <Typography variant="h6">Welcome, {alsoUser.given_name}!</Typography>
         </Box>
       ) : null}
-
-      {/* New Chat Button */}
-      <Box display='flex' justifyContent='center' margin={2}>
-        <Button
-          variant="contained"
-          sx={{ backgroundColor: 'black', color: 'white' }}
-          onClick={onNewChat}
-        >
-          New Chat
-        </Button>
-      </Box>
-
-      {/* Divider Line */}
-      <Divider />
-
       <List>
         {chatHistory.map((chat, index) => (
           <ListItem
