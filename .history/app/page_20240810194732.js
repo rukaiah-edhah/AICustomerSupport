@@ -16,16 +16,14 @@ import ChatSidebar from "@/components/ChatSidebar";
 import { LoginLink, LogoutLink } from "@kinde-oss/kinde-auth-nextjs";
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 import MenuIcon from "@mui/icons-material/Menu";
-import { v4 as uuidv4 } from 'uuid'; // Import UUID library
 
 export default function Home() {
-  const [chatHistory, setChatHistory] = useState([]); // Store all chats
-  const [currentChat, setCurrentChat] = useState([]);
+  const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [chatStarted, setChatStarted] = useState(false);
+  const [selectedChat, setSelectedChat] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [selectedChatId, setSelectedChatId] = useState(null);
 
   const messagesEndRef = useRef(null);
 
@@ -37,7 +35,7 @@ export default function Home() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [currentChat]);
+  }, [messages]);
 
   const sendMessage = async (text) => {
     const currentMessage = text || message;
@@ -49,8 +47,8 @@ export default function Home() {
     }
 
     setMessage('');
-    setCurrentChat((chat) => [
-      ...chat,
+    setMessages((messages) => [
+      ...messages,
       { role: 'user', content: currentMessage },
       { role: 'assistant', content: '' },
     ]);
@@ -61,7 +59,7 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify([...currentChat, { role: 'user', content: currentMessage }]),
+        body: JSON.stringify([...messages, { role: 'user', content: currentMessage }]),
       });
 
       if (!response.ok) {
@@ -75,9 +73,9 @@ export default function Home() {
         const { done, value } = await reader.read();
         if (done) break;
         const text = decoder.decode(value, { stream: true });
-        setCurrentChat((chat) => {
-          let lastMessage = chat[chat.length - 1];
-          let otherMessages = chat.slice(0, chat.length - 1);
+        setMessages((messages) => {
+          let lastMessage = messages[messages.length - 1];
+          let otherMessages = messages.slice(0, messages.length - 1);
           return [
             ...otherMessages,
             { ...lastMessage, content: lastMessage.content + text },
@@ -86,8 +84,8 @@ export default function Home() {
       }
     } catch (error) {
       console.error('Error:', error);
-      setCurrentChat((chat) => [
-        ...chat,
+      setMessages((messages) => [
+        ...messages,
         { role: 'assistant', content: "I'm sorry, but I encountered an error. Please try again later." },
       ]);
     }
@@ -101,40 +99,9 @@ export default function Home() {
     }
   };
 
-  const startNewChat = async () => {
-    // Save current chat to history
-    if (chatStarted) {
-      const chatId = uuidv4(); // Generate a unique ID for the new chat
-      const newChatHistory = {
-        id: chatId,
-        messages: currentChat,
-        createdAt: new Date().toLocaleString()
-      };
-      
-      setChatHistory((prevHistory) => [
-        ...prevHistory,
-        newChatHistory
-      ]);
-
-      // Optionally save to backend
-      await fetch('/api/save-chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newChatHistory),
-      });
-    }
-    // Clear current chat
-    setCurrentChat([]);
-    setChatStarted(false);
-    setSelectedChatId(null);
-  };
-
-  const setSelectedChat = (chat) => {
-    setCurrentChat(chat.messages);
-    setChatStarted(true);
-    setSelectedChatId(chat.id);
+  const startNewChat = () => {
+    setMessages([]);  // Clear messages
+    setChatStarted(false);  // Reset chat state
   };
 
   return (
@@ -146,10 +113,9 @@ export default function Home() {
     >
       {isSidebarOpen && (
         <ChatSidebar
-          selectedChatId={selectedChatId}
+          selectedChat={selectedChat}
           setSelectedChat={setSelectedChat}
-          chatHistory={chatHistory}
-          onNewChat={startNewChat}
+          onNewChat={startNewChat}  // Pass startNewChat function
         />
       )}
 
@@ -175,6 +141,40 @@ export default function Home() {
             )}
           </Toolbar>
         </AppBar>
+        {!chatStarted && (
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            justifyContent="center"
+            textAlign="center"
+            flexGrow={1}
+          >
+            <Typography variant="h4" color="black">
+              I am your AI-powered job application assistant.
+            </Typography>
+            <Typography variant="h6" color="black" mt={2}>
+              How can I help you achieve your career goals today?
+            </Typography>
+
+            <Stack direction={'row'} spacing={2} mt={4}>
+              <Button
+                variant="outlined"
+                style={{ borderColor: 'black', color: 'black', padding: '10px 20px' }}
+                onClick={() => sendMessage('how to prepare for an SWE technical interview')}
+              >
+                how to prepare for an SWE technical interview
+              </Button>
+              <Button
+                variant="outlined"
+                style={{ borderColor: 'black', color: 'black', padding: '10px 20px' }}
+                onClick={() => sendMessage('how to write a good resume for a data science role')}
+              >
+                how to write a good resume for a data science role
+              </Button>
+            </Stack>
+          </Box>
+        )}
         {chatStarted && (
           <Stack
             direction={'column'}
@@ -185,7 +185,7 @@ export default function Home() {
             flexGrow={1}
             mb={2}
           >
-            {currentChat.map((message, index) => (
+            {messages.map((message, index) => (
               <Box
                 key={index}
                 display="flex"

@@ -39,7 +39,7 @@ export default function ChatSidebar({ selectedChat, setSelectedChat, chatHistory
       <Divider />
       <List>
         {chatHistory.map((chat, index) => (
-          <ListItem button key={chat.id} onClick={() => setSelectedChat(chat)}>
+          <ListItem button key={index} onClick={() => setSelectedChat(chat)}>
             <ListItemText primary={`Chat ${index + 1}`} secondary={chat.createdAt} />
           </ListItem>
         ))}

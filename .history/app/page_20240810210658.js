@@ -111,6 +111,7 @@ export default function Home() {
         createdAt: new Date().toLocaleString()
       };
       
+      
       setChatHistory((prevHistory) => [
         ...prevHistory,
         newChatHistory

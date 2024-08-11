@@ -16,16 +16,14 @@ import ChatSidebar from "@/components/ChatSidebar";
 import { LoginLink, LogoutLink } from "@kinde-oss/kinde-auth-nextjs";
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 import MenuIcon from "@mui/icons-material/Menu";
-import { v4 as uuidv4 } from 'uuid'; // Import UUID library
 
 export default function Home() {
   const [chatHistory, setChatHistory] = useState([]); // Store all chats
-  const [currentChat, setCurrentChat] = useState([]);
+  const [currentChat, setCurrentChat] = useState([]); // Store current chat messages
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [chatStarted, setChatStarted] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [selectedChatId, setSelectedChatId] = useState(null);
 
   const messagesEndRef = useRef(null);
 
@@ -101,40 +99,22 @@ export default function Home() {
     }
   };
 
-  const startNewChat = async () => {
+  const startNewChat = () => {
     // Save current chat to history
     if (chatStarted) {
-      const chatId = uuidv4(); // Generate a unique ID for the new chat
-      const newChatHistory = {
-        id: chatId,
-        messages: currentChat,
-        createdAt: new Date().toLocaleString()
-      };
-      
       setChatHistory((prevHistory) => [
         ...prevHistory,
-        newChatHistory
+        { messages: currentChat, createdAt: new Date().toLocaleString() }
       ]);
-
-      // Optionally save to backend
-      await fetch('/api/save-chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newChatHistory),
-      });
     }
     // Clear current chat
     setCurrentChat([]);
     setChatStarted(false);
-    setSelectedChatId(null);
   };
 
   const setSelectedChat = (chat) => {
     setCurrentChat(chat.messages);
     setChatStarted(true);
-    setSelectedChatId(chat.id);
   };
 
   return (
@@ -146,7 +126,7 @@ export default function Home() {
     >
       {isSidebarOpen && (
         <ChatSidebar
-          selectedChatId={selectedChatId}
+          selectedChat={currentChat}
           setSelectedChat={setSelectedChat}
           chatHistory={chatHistory}
           onNewChat={startNewChat}

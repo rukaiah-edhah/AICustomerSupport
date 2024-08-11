@@ -101,40 +101,23 @@ export default function Home() {
     }
   };
 
-  const startNewChat = async () => {
-    // Save current chat to history
-    if (chatStarted) {
-      const chatId = uuidv4(); // Generate a unique ID for the new chat
-      const newChatHistory = {
-        id: chatId,
-        messages: currentChat,
-        createdAt: new Date().toLocaleString()
-      };
-      
-      setChatHistory((prevHistory) => [
-        ...prevHistory,
-        newChatHistory
-      ]);
-
-      // Optionally save to backend
-      await fetch('/api/save-chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+  const startNewChat = () => {
+    // Save the old chat to the history
+    if (messages.length > 0) {
+      setChatHistory([
+        ...chatHistory,
+        {
+          id: Date.now(), // Unique ID for each chat
+          createdAt: new Date().toLocaleString(),
+          messages: messages,
         },
-        body: JSON.stringify(newChatHistory),
-      });
+      ]);
     }
-    // Clear current chat
-    setCurrentChat([]);
-    setChatStarted(false);
-    setSelectedChatId(null);
-  };
 
-  const setSelectedChat = (chat) => {
-    setCurrentChat(chat.messages);
-    setChatStarted(true);
-    setSelectedChatId(chat.id);
+    // Start a new chat
+    setMessages([]);
+    setCurrentChatNumber(chatHistory.length + 1); // Update current chat number
+    setChatStarted(false);
   };
 
   return (
