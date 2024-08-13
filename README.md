@@ -14,6 +14,12 @@ The app was built during our fellowship to learn how to develop products that im
     </a>
 </div>
 
+
+
+https://github.com/user-attachments/assets/43719ba0-d305-4347-9b9a-75e148227beb
+
+
+
 ## Usage
 
 You can visit the deployed site at [AI Customer Support](https://ai-customer-support-tau.vercel.app/) and start a conversation with the AI to see how it responds to customer queries for a job application tracking site.
