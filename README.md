@@ -16,7 +16,10 @@ The app was built during our fellowship to learn how to develop products that im
 
 
 
-https://github.com/user-attachments/assets/43719ba0-d305-4347-9b9a-75e148227beb
+
+https://github.com/user-attachments/assets/57c697c7-cefd-488e-8497-5c385ed1fcd3
+
+
 
 
 
